@@ -37,13 +37,17 @@ Pros
  - The IDEs for javascript are not as intricate as the ones for Java.
  - Libraries are not as large as the ones for Java.
 
-
  —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
  	3 - Explain strategies to implement a Node.js based server architecture that still could
  	take advantage of a multi-core server.
  —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-Node.Js itself is an asynchronous
+Node.Js itself is asynchronous as opposed to JavaScript and the V8 engine. Node.Js makes asynchronous implementation 
+possible as it basis the execution of 'tasks' in an event loop and a event stack. The event loop being the main reason 
+for asynchronous code being able to run. The event loop and stack is used whenever code is run using Node.Js. Thus making
+Node.Js a great tool as it is easy to make asynchronous code. In order to make code synchronous this has to be 
+specified. Most methods that can be made synchronous can also be run asynchronously. In general no stategy needs to be
+followed but using Node.Js properly will lead to asynchrnous code execution.
 
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 	4 - Explain, using relevant examples, concepts related to the testing a REST-API using
@@ -56,13 +60,42 @@ Node.Js itself is an asynchronous
 	5 - Explain, using relevant examples, the Express concept; Middleware
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+The concept of middleware in Express is basically manually creating your own stack execution order. Middleware has access 
+to the Request and Response object and the Next function. Middleware can also be thought of as a filter for the response
+object. To create the stack order Middleware uses the Next function specifying what to be executed after a certain 
+function is run. There are different levels in which middleware canbe used. These being: application level, router 
+level, error handling and third party middleware. Although middleware is used in different levels of your server it 
+is created and ran in the same way. In a simple example I will show how middleware is used to create your own stack
+execution order.
+**/
+var express = require('express');
 
+var app = express();
 
+var server = app.listen(3000);
+
+function hello(req,res,next){
+  res.write('Hello \n');
+  next();
+}
+
+function bye(req,res,next){
+  res.write('Bye \n');
+  res.end();
+}
+
+app.get('/hello',hello,bye);
+
+/* So here I ahve specified that I want to first run my hello function and then my bye function. I am passing in both
+functions in the app.get() function. This will start off the execution in the order I have specifies. The res.end()
+will end the execution of the the functions and end the stack I have manually ordered.
  —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
  	6 - Explain, using relevant examples, how to implement sessions,
  	and the legal implications of doing this
  —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+To implement sessions or set cookies, websites now have to ask the user for permission to do so. Otherwise it is illegal
+do so.
 
  —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
  	7 - Compare the express strategy toward (server side) templating with the one
