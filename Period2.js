@@ -54,8 +54,34 @@ followed but using Node.Js properly will lead to asynchrnous code execution.
 	Node/JavaScript + relevant packages
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+When testing a Node.Js apps REST-API one can simply use the Request module. This is done by seeign if the request is
+ not failed and then returning something that will show that the test passed. This is the easiest and simplest way
+ to test a REST-API. But API tests can also be made using mocha, chai, jasmine or any other testing module.
+*/
+ Get:
 
+ request('http://localhost:3000/api/joke', function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        console.log(body);
+    }
+});
 
+ Post:
+
+ request({
+        url: "http: //localhost:3000/api/joke",
+        method: "POST",
+        json: true,
+        body: {
+            joke: "joke"
+        }
+    },
+ function (error, res, body) {
+        if (!error && res.statusCode == 200) {
+            console.log(body);
+        }
+    });
+/*
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 	5 - Explain, using relevant examples, the Express concept; Middleware
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -94,35 +120,108 @@ will end the execution of the the functions and end the stack I have manually or
  	and the legal implications of doing this
  —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-To implement sessions or set cookies, websites now have to ask the user for permission to do so. Otherwise it is illegal
-do so.
+To implement sessions using Express one simply has to write the following code:
+**/
 
- —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
- 	7 - Compare the express strategy toward (server side) templating with the one
- 	you used with Java on 2nd semester
- —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+ var express = require('express');
+ var app = express();
+
+ app.use(express.cookieParser());
+
+ app.use(express.session({secret: '1234567890'}));
+/*
+This simply creates a session using cookies. In order to see the current session you just have to use the request
+object and get the session of the current request.
+**/
+
+app.get('/page', function(req, res) {
+    if(req.session.lastPage) {
+        res.write('Last page was: ' + req.session.lastPage + '. ');
+    }
+
+	// Also can be done like this
+
+	var express = require('express');
+	var session = require("express-session");
+	var app = express();
+
+
+
+	app.use(session({
+		secret: 'secretWordIsSecret',
+		saveUninitialized: true,
+		resave: true
+	}));
+
+
+	/*
+    This is using the current session and prints out the last page the session visited.
+    To implement sessions or set cookies, websites now have to ask the user for permission to do so. Otherwise it is illegal
+    do so.
+
+     —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+         7 - Compare the express strategy toward (server side) templating with the one
+         you used with Java on 2nd semester
+     —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+    In Express to
+
+    —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        8 - Explain, using relevant examples, your strategy for implementing a REST-API with
+        Node/Express and show how you can “test” all the four CRUD operations programmatically
+        using for example the Request package
+    —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 
 
 
-—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-	8 - Explain, using relevant examples, your strategy for implementing a REST-API with
-	Node/Express and show how you can “test” all the four CRUD operations programmatically
-	using for example the Request package
-—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+    —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        9 - Explain, using relevant examples, about testing JavaScript code, relevant packages
+        (Mocha etc.) and how to test asynchronous code
+    —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+     Testing in Node.Js can be done fairly easily, using the npm package handler you are able to add test modules and then
+     require it. Then you simply have to write the test cases.
+     */
+ function add(n1, n2) { 
+ return n1 + n2; 
+ }
+
+   function addAsync(n1, n2, callback) { 
+ setTimeout(function () { 
+ var result = n1 + n2; 
+ console.log("In timer function"); 
+ callback(result); 
+ }, 1000);
+  }
+
+//-----------------------------------------------------
+
+     module.exports.add = add; 
+ module.exports.addAsync = addAsync;  
 
 
+	var expect = require("chai").expect;
+	var adder = require("../module");
+	describe("Test calculator", function () {
+		it("should return 4", function () {
+			expect(adder.add(2, 2)).to.be.equal(4);
+		});
 
+		it("should return 4 asynchronously", function(done) {
+			adder.addAsync(3, 3, function(res) {
+				expect(res).to.be.equal(6);
+				done();
+			})
+		});
+	});
 
-—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-	9 - Explain, using relevant examples, about testing JavaScript code, relevant packages
-	(Mocha etc.) and how to test asynchronous code
-—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-
+/*
 
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 	10 - Explain, using relevant examples, different ways to mock out databases, HTTP-request etc.
 —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+In order to mock http requests and database responses one simply has to add teh proper module that will allow for that.
 
  */
